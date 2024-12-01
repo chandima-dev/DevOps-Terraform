@@ -18,11 +18,11 @@ jobs:
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
       with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}  # Replace with your GCP project ID
-        credentials: ${{ secrets.GCP_CREDENTIALS_JSON }}  # Add GCP service account credentials to GitHub secrets
+        project_id: ${{ secrets.GCP_PROJECT_ID }}  
+        credentials: ${{ secrets.GCP_CREDENTIALS_JSON }}  
 
     - name: Terraform Init
-      run: terraform init -backend-config="bucket=${{ secrets.GCS_BUCKET_NAME }}" -backend-config="prefix=terraform/state"  # Using the secret for the GCS bucket name
+      run: terraform init -backend-config="bucket=devops-terraform-99" -backend-config="prefix=terraform/state"
 
     - name: Terraform Plan
       run: terraform plan
