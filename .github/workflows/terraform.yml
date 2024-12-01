@@ -1,0 +1,32 @@
+name: Terraform CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main         # Trigger the workflow when changes are pushed to the 'main' branch
+  pull_request:
+    branches:
+      - main         # Trigger the workflow when a pull request is made to 'main'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2    # Checks out the repository
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}  # Replace with your GCP project ID
+        credentials: ${{ secrets.GCP_CREDENTIALS_JSON }}  # Add GCP service account credentials to GitHub secrets
+
+    - name: Terraform Init
+      run: terraform init -backend-config="bucket=${{ secrets.GCS_BUCKET_NAME }}" -backend-config="prefix=terraform/state"  # Using the secret for the GCS bucket name
+
+    - name: Terraform Plan
+      run: terraform plan
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve
