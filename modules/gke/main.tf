@@ -62,9 +62,30 @@ resource "google_container_node_pool" "cpu_intensive_pool" {
     ]
   }
 }
+
 resource "google_storage_bucket" "terraform_state" {
-  name          = "my-terraform-state-bucket"  # Replace with your bucket name
-  location      = "US"                         # Replace with your region
-  force_destroy = true                         # Allow Terraform to delete the bucket
-  uniform_bucket_level_access = true           # Enable uniform bucket-level access
+  name          = var.bucket_name  # Referencing variable from tfvars
+  location      = var.bucket_location  # Referencing variable from tfvars
+  force_destroy = true
+  uniform_bucket_level_access = true
+
+  encryption {
+    default_kms_key_name = var.kms_key_name  # Referencing variable from tfvars
+  }
+}
+
+
+
+# Restrict the project to a specific value
+resource "google_project" "restricted_project" {
+  project_id = var.project_id
+
+  # Restrict the project
+  name       = "Restricted Project"
+  org_id     = var.org_id  # Replace with your organization ID
+  billing_account = var.billing_account_id  # Replace with your billing account ID
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
